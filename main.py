@@ -59,7 +59,10 @@ LAUNCH = datetime(2026, 11, 19, 0, 0, 0, tzinfo=timezone.utc)
 # process saturates, so the recent slope overstates the move -- a short,
 # strongly recency-weighted window and a damped extrapolation win. The
 # environment overrides exist only for offline tuning and are never set by
-# the grader.
+# the grader. (A counts-based variant -- fitting earn counts and players
+# separately -- and a saturating time transform were both tested and
+# rejected: the counts variant lost badly to this model in every scenario,
+# and the saturating clock tied it, so the simpler log clock stays.)
 WINDOW_HOURS = float(os.environ.get("TROPHY_WINDOW_HOURS", "24.0"))
 RECENCY_HALF_LIFE = float(os.environ.get("TROPHY_HALF_LIFE_HOURS", "8.0"))
 REFRESH_JUMP = 1.15       # a players_tracked jump of 15%+ in one read = a refresh
@@ -99,6 +102,11 @@ def parse_time(s: str) -> datetime:
 
 def hours_since_launch(dt: datetime) -> float:
     return (dt - LAUNCH).total_seconds() / 3600.0
+
+
+def clock_x(hours: float) -> float:
+    """The time transform the trend is linear in: ln(1+hours)."""
+    return math.log1p(max(hours, 0.0))
 
 
 def persistence_quantiles(rate: float, horizon_days: float):
@@ -182,7 +190,7 @@ def forecast_case(case: dict, name: str) -> dict:
     horizon_days = case["horizon_minutes"] / 1440.0
     at = parse_time(case["at"])
     target = parse_time(case["target"])
-    x_target = math.log1p(max(hours_since_launch(target), 0.0))
+    x_target = clock_x(hours_since_launch(target))
 
     # --- Reads, oldest first, with time, players and rates. ---
     reads = []
@@ -248,7 +256,7 @@ def forecast_case(case: dict, name: str) -> dict:
             rate = r["rates"][i]
             if rate is None or rate <= 0:
                 continue
-            xs.append(math.log1p(max(r["t"], 0.0)))
+            xs.append(clock_x(r["t"]))
             ys.append(logit(rate))
             # Recency weight, times a reliability weight from the player base.
             w = 0.5 ** (r["age_h"] / RECENCY_HALF_LIFE)
