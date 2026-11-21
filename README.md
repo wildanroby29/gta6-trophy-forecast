@@ -1,5 +1,9 @@
 # GTA VI Trophy Rarity Forecaster
 
+[![make.fun](https://make.fun/badge/gta6-trophy-rarity-forecast-01.svg)](https://make.fun/bounty/gta6-trophy-rarity-forecast-01)
+[![rank](https://make.fun/badge/gta6-trophy-rarity-forecast-01/wildanroby29/gta6-trophy-forecast/rank.svg)](https://make.fun/bounty/gta6-trophy-rarity-forecast-01)
+[![reward](https://make.fun/badge/gta6-trophy-rarity-forecast-01/wildanroby29/gta6-trophy-forecast/reward.svg)](https://make.fun/bounty/gta6-trophy-rarity-forecast-01)
+
 Forecasts, for every Grand Theft Auto VI trophy on PlayStation 5, the share
 of players who will have earned it a week after launch (26 November 2026),
 as five quantiles (5%, 25%, 50%, 75%, 95%) of its earn rate on
